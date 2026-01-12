@@ -1,1144 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>DW Patched by DDatiOS</title>
-    <link type="image/png" rel="icon" href="favicon.png" />
-    <meta
-      id="viewport"
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script type="text/javascript" src="cordova.js"></script>
-    <script type="text/javascript" src="cordova_plugins.js"></script>
-    <script type="text/javascript" src="./lib/RaygunHelper.js"></script>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>MythBeast Arena</title>
+	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<script type="text/javascript">
+        console.log("Game Modded By DDatiOS");
+        window.GameAnalytics = { configureAutoDetectAppVersion: function() {}, setEnabledInfoLog: function() {}, setEnabledVerboseLog: function() {}, initialize: function() {}, startSession: function() {} };
+        window.plugins = { impacTracking: { requestTracking: function(arg1, successCallback, errorCallback) { if (typeof successCallback === 'function') { successCallback("granted"); } } } };
+        window.notificationAuthorization = { requestNotificationAuthorization: function(callback) { if (typeof callback === 'function') { callback(); } } };
+        window.navigator.didomi = { initialize: function(apiKey, anotherKey, successCallback, errorCallback) { if (typeof errorCallback === 'function') { errorCallback(); } }, getUserConsent: function(callback) { if(typeof callback === 'function') { callback('true'); } }, setUserDisagreeToAll: function() {}, showNotice: function() {} };
+        window.store = { QUIET: 'quiet', NON_CONSUMABLE: 'non_consumable', CONSUMABLE: 'consumable', verbosity: '', when: function() { return this; }, updated: function() { return this; }, error: function(cb) { return this; }, approved: function() { return this; }, cancelled: function(cb) { return this; }, finished: function() { return this; }, initiated: function() { return this; }, register: function() {}, order: function() {}, get: function(productId) { return { id: productId, price: "$0.99", title: "Mock Product", state: "approved", owned: true }; }, refresh: function() { var mockPromise = { completed: function(callback) { if (typeof callback === 'function') { callback(); } return this; }, failed: function(callback) { return this; }, cancelled: function(callback) { return this; } }; return mockPromise; } };
+        window.cordova = { plugin: { cloudsettings: { isSignedInToICloud: function(callback) { if (typeof callback === 'function') { callback(false); } }, enableDebug: function() {}, exists: function() {}, save: function() {}, load:function() {} } }, plugins: { impacTracking: window.plugins.impacTracking, firebase: { analytics: { logEvent: function(name, params) { console.log("Mock: FirebaseAnalytics.logEvent() -> Name: " + name, params); } } } } };
+    </script>
     <script type="text/javascript" src="./lib/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script type="text/javascript" src="./lib/firebase-database.js"></script>
-    <script type="text/javascript" src="./lib/core-js.js"></script>
-    <script type="text/javascript" src="./lib/array.polyfill.js"></script>
-    <script type="text/javascript" src="./lib/ApplovinWrap.js"></script>
-    <script type="text/javascript" src="./lib/date.polyfill.js"></script>
-    <script type="text/javascript" src="./lib/int-8-array.polyfill.js"></script>
-    <script type="text/javascript" src="./lib/math.polyfill.js"></script>
-    <script type="text/javascript" src="./lib/number.polyfill.js"></script>
-    <script type="text/javascript" src="./lib/string.polyfill.js"></script>
-    <script
-      type="text/javascript"
-      src="./lib/uint-8-array.polyfill.js"
-    ></script>
-    <script type="text/javascript" src="./lib/window.polyfill.js"></script>
-    <script
-      type="text/javascript"
-      src="./lib/promise-finaly.polyfill.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="./lib/web-audio-api-shim.min.js"
-    ></script>
-    <style>
-      @font-face {
-        font-family: "Font Awesome 6 Brands";
-        src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2")
-          format("woff2");
-        font-display: swap;
-      }
-
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-family: "Poppins", sans-serif;
-        background: radial-gradient(circle, #3a3a3a 0%, #1a1a1a 100%);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-      }
-      #content {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        z-index: 1;
-        background: transparent;
-      }
-      *:focus { outline: none; }
-      * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-
-      :root {
-        --theme-primary-color: #b388ff;
-        --theme-secondary-color: #7c4dff;
-        --button-primary-color: #b388ff;
-        --button-secondary-color: #7c4dff;
-
-        --panel-bg: rgba(30, 30, 30, 0.55);
-        --panel-border: rgba(255,255,255,0.08);
-        --header-bg: rgba(255,255,255,0.02);
-        --text-color: #f8f8f8;
-        --tab-color: #cfcfcf;
-        --tab-hover-bg: rgba(255,255,255,0.04);
-        --console-bg: rgba(8,8,8,0.7);
-        --input-bg: rgba(20,20,20,0.6);
-        --input-border: rgba(255,255,255,0.06);
-        --toggle-bg-off: rgba(120,120,120,0.35);
-      }
-
-      .light-theme {
-        --panel-bg: rgba(255,255,255,0.72);
-        --panel-border: rgba(0,0,0,0.06);
-        --header-bg: rgba(0,0,0,0.03);
-        --text-color: #222;
-        --tab-color: #555;
-        --tab-hover-bg: rgba(0,0,0,0.04);
-        --console-bg: rgba(250,250,250,0.9);
-        --input-bg: #fff;
-        --input-border: rgba(0,0,0,0.08);
-        --toggle-bg-off: rgba(200,200,200,0.7);
-      }
-
-      #mod-menu-btn {
-        position: fixed;
-        bottom: calc(18px + env(safe-area-inset-bottom));
-        right: 18px;
-        width: 56px;
-        height: 56px;
-        padding: 0;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.06);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 14px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-        cursor: grab;
-        z-index: 2147483647;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
-      }
-      #mod-menu-btn:active { transform: scale(0.96); }
-      #mod-menu-btn img {
-        width: 62%;
-        height: 62%;
-        border-radius: 10px;
-        object-fit: cover;
-        display: block;
-        background-color: var(--button-primary-color);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.6);
-        pointer-events: none;
-        user-select: none;
-        user-drag: none;
-        -webkit-user-drag: none;
-      }
-
-      #mod-menu-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-        z-index: 199999; display: flex; justify-content: center; align-items: center;
-        opacity: 0; pointer-events: none; transition: opacity 0.24s ease;
-      }
-      #mod-menu-overlay.visible { opacity: 1; pointer-events: all; }
-
-      #mod-menu-panel {
-        background: var(--panel-bg);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid var(--panel-border);
-        border-radius: 20px;
-        width: 92%;
-        max-width: 760px;
-        height: 78vh;
-        max-height: 760px;
-        box-shadow: 0 24px 50px rgba(0,0,0,0.5);
-        display: flex; flex-direction: column;
-        color: var(--text-color);
-        padding-top: env(safe-area-inset-top);
-      }
-
-      #mod-menu-header {
-        padding: 14px 18px;
-        background-color: var(--header-bg);
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: move;
-        border-radius: 20px 20px 0 0;
-      }
-      #mod-menu-header h3 { margin: 0; color: var(--text-color); font-weight: 700; display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
-      #mod-menu-close-btn { background: none; border: none; color: var(--tab-color); font-size: 26px; cursor: pointer; line-height: 1; padding: 0 6px; }
-      #mod-menu-close-btn:hover { color: var(--text-color); }
-
-      #mod-menu-tabs {
-  flex-shrink: 0;
-  min-height: 44px;
-  padding: calc(6px + env(safe-area-inset-top)) 10px;
-  overflow-x: auto;
-}
-#mod-menu-header,
-#mod-menu-footer {
-  flex-shrink: 0;
+	<style>
+        html, body {
+            margin: 0; padding: 0; height: 100%; overflow: hidden;
+            background-color: #1a1a1a;
+            display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        canvas {
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-#mod-menu-content-container {
-  flex: 1;
-  min-height: 0;
+@media (pointer: coarse) {
+  canvas {
+    touch-action: auto;
+  }
 }
-#mod-menu-tabs::-webkit-scrollbar {
-  display: none;
+
+@media (pointer: fine) {
+  canvas {
+    touch-action: none;
+  }
 }
-      .mod-menu-tab-btn {
-        padding: 9px 12px;
-        background: rgba(255,255,255,0.05);
-        border: none;
-        color: var(--tab-color);
-        font-weight: 600;
-        cursor: pointer;
-        transition: color 0.18s, background-color 0.18s, transform 0.12s;
-        border-radius: 10px;
-        display: inline-flex; align-items:center; gap:8px; font-size:0.95rem;
-        white-space: nowrap;
-      }
-      @media (max-width: 480px) {
-    .mod-menu-tab-btn {
-        font-size: 12px;
-    }
-}
-      .mod-menu-tab-btn:hover { color: var(--text-color); background-color: var(--tab-hover-bg); transform: translateY(-1px); }
-      .mod-menu-tab-btn.active {
-        color: var(--theme-primary-color);
-        background: linear-gradient(90deg, rgba(0,0,0,0.06), rgba(255,255,255,0.02));
-        box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
-      }
-
-      #mod-menu-content-container { flex-direction: column; display: flex; flex-grow: 1; overflow: hidden; }
-
-      .tab-content { display: none; padding: 14px; overflow-y: auto; }
-      .tab-content.active { display: block; }
-
-      .tab-content:not(#console-tab) { flex: 1 1 auto; min-height: 0; }
-
-      .ls-item { margin-bottom: 12px; display: flex; flex-direction: column; }
-      .ls-item label { color: var(--theme-primary-color); font-weight: 600; margin-bottom: 6px; word-break: break-word; }
-      .ls-item textarea {
-        width: 100%; min-height: 56px; padding: 10px; box-sizing: border-box; border-radius: 8px;
-        border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);
-        font-family: 'Courier New', Courier, monospace; font-size: 13px; resize: vertical;
-      }
-
-      #mod-menu-footer {
-        padding: 12px; border-top: 1px solid rgba(255,255,255,0.02);
-        display: flex; justify-content: flex-end; gap: 10px; background-color: transparent;
-        border-radius: 0 0 20px 20px;
-      }
-      #mod-menu-footer button {
-        padding: 10px 16px; border: none; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; display:inline-flex; align-items:center; gap:8px;
-        background-image: linear-gradient(45deg, var(--button-secondary-color), var(--button-primary-color));
-      }
-      #refresh-ls-btn { background-color: rgba(90,90,90,0.6); background-image: none; color: #fff; }
-      #refresh-ls-btn:hover { filter: brightness(1.05); }
-
-      #console-tab {
-        display: none;
-        flex-direction: column;
-        padding: 0;
-        overflow: hidden;
-        transition: height 0.22s ease;
-        box-sizing: border-box;
-      }
-      #console-tab.active { display: flex; }
-
-      #console-tab:not(.expanded) {
-        height: 260px;
-        flex: 0 0 260px;
-      }
-
-      #console-tab.expanded {
-        height: auto;
-        flex: 1 1 auto;
-      }
-
-      #console-output {
-        flex: 1 1 auto;
-        min-height: 0;
-        background: var(--console-bg);
-        color: var(--text-color);
-        padding: 12px;
-        overflow-y: auto;
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 13px;
-        white-space: pre-wrap;
-        box-sizing: border-box;
-        border-radius: 0;
-      }
-      #console-output .log-item { margin-bottom: 6px; opacity: 0.95; }
-
-      #console-tab.expanded #console-output { padding-bottom: 18px; }
-
-      .log-item { line-height: 1.38; border-bottom: 1px dotted rgba(255, 255, 255, 0.02); padding: 4px 0; }
-      .log-item.log { color: var(--text-color); }
-      .log-item.info { color: var(--theme-primary-color); }
-      .log-item.warn { color: #f0c36a; }
-      .log-item.error { color: #ff7a7a; }
-
-      #console-input-container {
-        display: flex;
-        padding: 10px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-        border-radius: 0 0 18px 18px;
-        box-sizing: border-box;
-      }
-      #console-input {
-        flex: 1 1 auto;
-        padding: 9px;
-        border: 1px solid var(--input-border);
-        border-radius: 10px;
-        background: var(--input-bg);
-        color: var(--text-color);
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 13px;
-        min-height: 40px;
-        max-height: 120px;
-        resize: vertical;
-      }
-
-      #console-run-btn, #console-clear-btn, #console-expand-btn {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-      }
-      #console-run-btn { background-image: linear-gradient(45deg, var(--button-secondary-color), var(--button-primary-color)); }
-      #console-clear-btn { background: rgba(217,83,79,0.95); }
-      #console-expand-btn { background: rgba(90,90,90,0.55); }
-
-      #console-expand-btn.expanded .fa-expand { display: none; }
-      #console-expand-btn:not(.expanded) .fa-compress { display: none; }
-
-      .setting-group { margin-bottom: 18px; }
-      .setting-group h4 {
-        color: var(--theme-primary-color); font-size: 1.02rem; margin-bottom: 8px; padding-bottom: 6px; font-weight:700; display:flex; gap:8px; align-items:center;
-      }
-      .setting-item { display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
-      .setting-item label { color: var(--text-color); font-weight: 500; font-size: 0.95rem; }
-
-      .ios-toggle {
-        width: 46px;
-        height: 26px;
-        border-radius: 20px;
-        background: var(--toggle-bg-off);
-        position: relative;
-        display: inline-block;
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);
-        transition: background 0.22s ease;
-        cursor: pointer;
-      }
-      .ios-toggle .knob {
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #fff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        transition: transform 0.22s cubic-bezier(.2,.8,.2,1);
-      }
-      .ios-toggle.active { background: var(--theme-primary-color); }
-      .ios-toggle.active .knob { transform: translateX(20px); }
-
-      .color-picker-container { display:flex; align-items:center; gap:10px; }
-      .color-picker-input { width:26px; height:26px; border-radius:6px; border:none; padding:0; box-shadow: 0 0 0 2px var(--input-border); background:transparent; cursor:pointer; }
-      .current-color-hex { color: var(--theme-primary-color); font-weight:700; font-size:0.9rem; }
-
-      @media (max-width: 420px) {
-        #mod-menu-panel { width: 96%; height: 86vh; max-width: none; border-radius:14px; }
-        #console-tab:not(.expanded) { height: 220px; flex:0 0 220px; }
-      }
+        #content { background: #ffffff; }
     </style>
-  </head>
-  <body class="dark-theme">
-    <div id="version" style="z-index: 9999; position: absolute; color: white; left: 75%">1.12.29 iOS</div>
-    <div id="content"></div>
-
-    <div id="mod-menu-btn"
-      role="button"
-      tabindex="0"
-      draggable="false"
-      title="Open Save Editor">
-      <img src="https://i.pinimg.com/736x/5b/eb/b1/5bebb15a07fc6bcda8f12b56fee5a4b3.jpg" alt="Menu" />
-    </div>
-
-    <div id="mod-menu-overlay" class="hidden" aria-hidden="true">
-      <div id="mod-menu-panel" role="dialog" aria-modal="true" aria-label="Mod Menu Panel">
-        <div id="mod-menu-header">
-          <h3 id="panel-title"><i class="fas fa-magic"></i> Mod Menu</h3>
-          <button id="mod-menu-close-btn" type="button" aria-label="Close menu">&times;</button>
-        </div>
-
-        <div id="mod-menu-tabs" role="tablist" aria-label="Menu Tabs">
-          <button class="mod-menu-tab-btn active" type="button" data-tab="ls-editor" role="tab" aria-selected="true"><i class="fas fa-database"></i> Save Editor</button>
-          <button class="mod-menu-tab-btn" type="button" data-tab="console" role="tab" aria-selected="false"><i class="fas fa-terminal"></i> Console</button>
-          <button class="mod-menu-tab-btn"
-        type="button"
-        data-tab="online"
-        role="tab"
-        aria-selected="false">
-  <i class="fas fa-users"></i> Online
-</button>
-          <button class="mod-menu-tab-btn" type="button" data-tab="settings" role="tab" aria-selected="false"><i class="fas fa-cog"></i> Settings</button>
-        </div>
-
-        <div id="mod-menu-content-container">
-          <div id="ls-editor-tab" class="tab-content active" role="tabpanel">
-          </div>
-
-          <div id="console-tab" class="tab-content" role="tabpanel" aria-hidden="true">
-            <div id="console-output" aria-live="polite"></div>
-            <div id="console-input-container">
-              <form id="console-form" style="display:flex; width:100%; align-items:center;">
-                <textarea id="console-input" placeholder="Nhập mã JavaScript..." rows="1" aria-label="Console input"></textarea>
-                <button id="console-run-btn" type="submit" title="Run"><i class="fas fa-play"></i></button>
-                <button id="console-clear-btn" type="button" title="Clear"><i class="fas fa-trash"></i></button>
-                <button id="console-expand-btn" type="button" title="Toggle expand">
-                  <i class="fas fa-expand"></i>
-                  <i class="fas fa-compress"></i>
-                </button>
-              </form>
-            </div>
-          </div>
-
-          <div id="online-tab" class="tab-content" role="tabpanel">
-  <div style="text-align:center; padding:26px;">
-    <h2 style="margin-bottom:14px;">
-      <i class="fas fa-users"></i> Thống kê Mod
-    </h2>
-
-    <div style="font-size:48px; font-weight:700; color:var(--theme-primary-color);" id="online-count">
-      --
-    </div>
-    <div style="opacity:0.8;">đang online</div>
-
-    <div style="margin-top:18px; font-size:14px;">
-      Tổng đã dùng: <b id="total-users">--</b><br>
-      Peak online: <b id="peak-online">--</b>
-    </div>
-
-    <canvas id="online-chart"
-        width="260"
-        height="90"
-        style="margin-top:18px; background:rgba(0,0,0,0.25); border-radius:8px;">
-</canvas>
-
-    <div id="online-status"
-         style="margin-top:16px; font-size:13px; font-weight:600;">
-      Đang kết nối...
-    </div>
-  </div>
-</div>
-
-          <div id="settings-tab" class="tab-content" role="tabpanel">
-            <div class="setting-group">
-              <h4><i class="fas fa-palette"></i> Tùy Chỉnh Giao Diện</h4>
-              <div class="setting-item">
-                <label for="theme-toggle">Theme Sáng (Light Mode)</label>
-                <div class="ios-toggle" id="theme-toggle-btn" role="switch" aria-checked="false" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-              </div>
-              <div class="setting-item">
-                <label for="theme-color-input">Màu Chủ Đạo (Text/Border)</label>
-                <div class="color-picker-container">
-                    <input type="color" id="theme-color-input" class="color-picker-input" value="#b388ff">
-                    <span id="current-theme-hex" class="current-color-hex">#B388FF</span>
-                </div>
-              </div>
-               <div class="setting-item">
-                <label for="button-color-input">Màu Nút Chức Năng (Run/Save)</label>
-                <div class="color-picker-container">
-                    <input type="color" id="button-color-input" class="color-picker-input" value="#b388ff">
-                    <span id="current-button-hex" class="current-color-hex">#B388FF</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="setting-group">
-              <h4><i class="fas fa-info-circle"></i> Thông Tin</h4>
-              <div class="setting-item">
-                <label>Phiên Bản Mod Menu</label>
-                <span style="color: #ccc; font-size: 0.95rem;">v1.0.5 Beta</span>
-              </div>
-              <div class="setting-item">
-                <label>Người Phát Triển</label>
-                <span style="color: #ccc; font-size: 0.95rem;">DDatiOS :)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="mod-menu-footer">
-          <button id="refresh-ls-btn" type="button"><i class="fas fa-sync-alt"></i> Refresh Values</button>
-          <button id="save-ls-btn" type="button"><i class="fas fa-save"></i> Save & Reload Game</button>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      const body = document.body;
-      const root = document.documentElement;
-      const openBtn = document.getElementById('mod-menu-btn');
-      const closeBtn = document.getElementById('mod-menu-close-btn');
-      const overlay = document.getElementById('mod-menu-overlay');
-      const panel = document.getElementById('mod-menu-panel');
-      const lsEditorContent = document.getElementById('ls-editor-tab');
-      const saveBtn = document.getElementById('save-ls-btn');
-      const refreshBtn = document.getElementById('refresh-ls-btn');
-      const header = document.getElementById('mod-menu-header');
-
-      const tabButtons = document.querySelectorAll('.mod-menu-tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-      const panelTitle = document.getElementById('panel-title');
-      const modMenuFooter = document.getElementById('mod-menu-footer');
-
-      const consoleTab = document.getElementById('console-tab');
-      const consoleOutput = document.getElementById('console-output');
-      const consoleInput = document.getElementById('console-input');
-      const consoleForm = document.getElementById('console-form');
-      const consoleRunBtn = document.getElementById('console-run-btn');
-      const consoleClearBtn = document.getElementById('console-clear-btn');
-      const consoleExpandBtn = document.getElementById('console-expand-btn');
-
-      const themeToggleBtn = document.getElementById('theme-toggle-btn');
-      const themeColorInput = document.getElementById('theme-color-input');
-      const currentColorHex = document.getElementById('current-theme-hex');
-      const buttonColorInput = document.getElementById('button-color-input');
-      const currentButtonHex = document.getElementById('current-button-hex');
-
-      let isDragging = false;
-      let startX = 0, startY = 0;
-      let origX = 0, origY = 0;
-      let translateX = 0, translateY = 0;
-
-      function onPointerDown(e) {
-        const targetInsideHeader = e.target;
-        const clickedClose = (e.target === closeBtn) || (e.target.closest && e.target.closest('#mod-menu-close-btn'));
-        if (clickedClose) return;
-        e.preventDefault && e.preventDefault();
-
-        isDragging = true;
-        startX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
-        startY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
-        origX = translateX;
-        origY = translateY;
-        if (e.target.setPointerCapture) {
-          try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
-        }
-        document.body.style.userSelect = 'none';
-      }
-      function onPointerMove(e) {
-        if (!isDragging) return;
-        e.preventDefault && e.preventDefault();
-        const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
-        const dx = clientX - startX;
-        const dy = clientY - startY;
-        translateX = origX + dx;
-        translateY = origY + dy;
-        panel.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`;
-      }
-      function onPointerUp(e) {
-        if (!isDragging) return;
-        isDragging = false;
-        document.body.style.userSelect = '';
-        if (e.target && e.target.releasePointerCapture) {
-          try { e.target.releasePointerCapture(e.pointerId); } catch (err) {}
-        }
-        origX = translateX;
-        origY = translateY;
-      }
-      if (window.PointerEvent) {
-        //header.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('pointermove', onPointerMove, { passive: false });
-        document.addEventListener('pointerup', onPointerUp);
-        document.addEventListener('pointercancel', onPointerUp);
-      }
-      function resetPanelPosition() {
-        translateX = 0;
-        translateY = 0;
-        origX = 0;
-        origY = 0;
-        panel.style.transform = 'translate3d(0, 0, 0)';
-      }
-
-      function populateMenu() {
-        lsEditorContent.innerHTML = '';
-        if (localStorage.length === 0) {
-          lsEditorContent.innerHTML = '<p style="color:#888; text-align:center;">LocalStorage is empty. Play the game to generate save data.</p>';
-          return;
-        }
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key === 'mod_theme' || key === 'mod_theme_color' || key === 'mod_button_color') continue;
-
-          const value = localStorage.getItem(key);
-          const itemDiv = document.createElement('div');
-          itemDiv.className = 'ls-item';
-          const label = document.createElement('label');
-          label.textContent = key;
-          const textarea = document.createElement('textarea');
-          textarea.value = value;
-          textarea.dataset.key = key;
-          itemDiv.appendChild(label);
-          itemDiv.appendChild(textarea);
-          lsEditorContent.appendChild(itemDiv);
-        }
-      }
-      function saveChanges() {
-        const textareas = lsEditorContent.querySelectorAll('textarea');
-        let changesMade = false;
-        textareas.forEach(ta => {
-          const key = ta.dataset.key;
-          const newValue = ta.value;
-          const oldValue = localStorage.getItem(key);
-          if (newValue !== oldValue) {
-            localStorage.setItem(key, newValue);
-            changesMade = true;
-          }
-        });
-        if (changesMade) {
-          alert('Đã lưu thay đổi! Game sẽ được tải lại để áp dụng.');
-          location.reload();
-        } else {
-          alert('Không có thay đổi nào để lưu.');
-        }
-      }
-      if (saveBtn) saveBtn.addEventListener('click', saveChanges);
-      if (refreshBtn) refreshBtn.addEventListener('click', populateMenu);
-
-      const originalConsole = { ...console };
-      let isConsoleExpanded = false;
-
-      function toggleConsoleExpand() {
-        isConsoleExpanded = !isConsoleExpanded;
-        if (isConsoleExpanded) {
-          consoleTab.classList.add('expanded');
-          consoleExpandBtn.classList.add('expanded');
-          consoleExpandBtn.setAttribute('aria-pressed', 'true');
-        } else {
-          consoleTab.classList.remove('expanded');
-          consoleExpandBtn.classList.remove('expanded');
-          consoleExpandBtn.setAttribute('aria-pressed', 'false');
-        }
-        setTimeout(() => { consoleOutput.scrollTop = consoleOutput.scrollHeight; }, 120);
-      }
-
-      if (consoleExpandBtn) {
-        consoleExpandBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          toggleConsoleExpand();
-        });
-      }
-
-      function logToScreen(level, message, ...optionalParams) {
-          const item = document.createElement('div');
-          item.className = `log-item ${level}`;
-          let logContent = [message, ...optionalParams].map(arg => {
-              if (typeof arg === 'object' && arg !== null) {
-                  try { return JSON.stringify(arg, null, 2); } catch (e) { return String(arg); }
-              }
-              return String(arg);
-          }).join(' ');
-          item.textContent = `[${level.toUpperCase()}] ${logContent}`;
-          consoleOutput.appendChild(item);
-          consoleOutput.scrollTop = consoleOutput.scrollHeight;
-
-          if (originalConsole[level]) {
-              try { originalConsole[level](message, ...optionalParams); } catch (e) {}
-          }
-      }
-      console.log = function() { logToScreen('log', ...arguments); };
-      console.info = function() { logToScreen('info', ...arguments); };
-      console.warn = function() { logToScreen('warn', ...arguments); };
-      console.error = function() { logToScreen('error', ...arguments); };
-
-      function runConsoleCommand() {
-          const command = consoleInput.value.trim();
-          if (!command) return;
-          const commandItem = document.createElement('div');
-          commandItem.className = 'log-item info';
-          commandItem.textContent = `> ${command}`;
-          consoleOutput.appendChild(commandItem);
-
-          try {
-              let result = (function(){ return eval(command); })();
-              let outputMessage;
-              if (result === undefined) {
-                  outputMessage = 'Command executed.';
-                  logToScreen('info', outputMessage);
-              } else {
-                  if (typeof result === 'object' && result !== null) {
-                      try { outputMessage = JSON.stringify(result, null, 2); } catch (e) { outputMessage = String(result); }
-                  } else if (typeof result === 'function') {
-                       outputMessage = `[Function: ${result.name || 'anonymous'}]`;
-                  } else {
-                      outputMessage = String(result);
-                  }
-                  logToScreen('log', `Kết quả: ${outputMessage}`);
-              }
-          } catch (e) {
-              logToScreen('error', `Lỗi: ${e.name}: ${e.message}`);
-          }
-          consoleInput.value = '';
-          consoleOutput.scrollTop = consoleOutput.scrollHeight;
-      }
-
-      if (consoleForm) {
-        consoleForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          runConsoleCommand();
-        });
-      }
-      if (consoleClearBtn) {
-        consoleClearBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          consoleOutput.innerHTML = '';
-          logToScreen('info', 'Console đã được xóa.');
-        });
-      }
-
-      function isHexColor(hex) {
-        return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
-      }
-
-      function hexToRgb(hex) {
-          const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-          hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-          return result ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          } : null;
-      }
-
-      function getDarkerHex(hex, factor = 0.2) {
-          if (!isHexColor(hex)) return hex;
-          const rgb = hexToRgb(hex);
-          if (!rgb) return hex;
-
-          const r = Math.max(0, rgb.r - Math.round(rgb.r * factor));
-          const g = Math.max(0, rgb.g - Math.round(rgb.g * factor));
-          const b = Math.max(0, rgb.b - Math.round(rgb.b * factor));
-
-          const componentToHex = (c) => {
-              const h = c.toString(16);
-              return h.length == 1 ? "0" + h : h;
-          };
-
-          return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
-      }
-
-      function applyThemeColor(hex) {
-        if (!isHexColor(hex)) return;
-        const secondaryColor = getDarkerHex(hex, 0.18);
-        root.style.setProperty('--theme-primary-color', hex);
-        root.style.setProperty('--theme-secondary-color', secondaryColor);
-        themeColorInput.value = hex;
-        currentColorHex.textContent = hex.toUpperCase();
-        localStorage.setItem('mod_theme_color', hex);
-      }
-
-      function applyButtonColor(hex) {
-        if (!isHexColor(hex)) return;
-        const secondaryColor = getDarkerHex(hex, 0.18);
-        root.style.setProperty('--button-primary-color', hex);
-        root.style.setProperty('--button-secondary-color', secondaryColor);
-        buttonColorInput.value = hex;
-        currentButtonHex.textContent = hex.toUpperCase();
-        localStorage.setItem('mod_button_color', hex);
-        const menuImg = document.querySelector('#mod-menu-btn img');
-        if (menuImg) menuImg.style.backgroundColor = hex;
-      }
-
-      function applyTheme(isLight) {
-        if (isLight) {
-          body.classList.add('light-theme');
-          localStorage.setItem('mod_theme', 'light');
-          if (themeToggleBtn) { themeToggleBtn.classList.add('active'); themeToggleBtn.setAttribute('aria-checked','true'); }
-        } else {
-          body.classList.remove('light-theme');
-          localStorage.setItem('mod_theme', 'dark');
-          if (themeToggleBtn) { themeToggleBtn.classList.remove('active'); themeToggleBtn.setAttribute('aria-checked','false'); }
-        }
-      }
-
-      function loadSettings() {
-        const savedTheme = localStorage.getItem('mod_theme') || 'dark';
-        const isLight = savedTheme === 'light';
-        applyTheme(isLight);
-
-        const savedThemeColor = localStorage.getItem('mod_theme_color') || '#b388ff';
-        applyThemeColor(savedThemeColor);
-
-        const savedButtonColor = localStorage.getItem('mod_button_color') || '#b388ff';
-        applyButtonColor(savedButtonColor);
-      }
-
-      if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-          const isActive = themeToggleBtn.classList.toggle('active');
-          applyTheme(isActive);
-        });
-        themeToggleBtn.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            themeToggleBtn.click();
-          }
-        });
-      }
-
-      if (themeColorInput) {
-        themeColorInput.addEventListener('input', (e) => {
-          applyThemeColor(e.target.value.toUpperCase());
-        });
-      }
-      if (buttonColorInput) {
-        buttonColorInput.addEventListener('input', (e) => {
-          applyButtonColor(e.target.value.toUpperCase());
-        });
-      }
-
-      function switchTab(targetTabId) {
-        tabContents.forEach(content => content.classList.remove('active'));
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-
-        const targetContent = document.getElementById(targetTabId);
-        if (!targetContent) return;
-        targetContent.classList.add('active');
-
-        const btn = document.querySelector(`[data-tab="${targetTabId.replace('-tab','')}"]`);
-        if (btn) btn.classList.add('active');
-
-        const tabName = (btn && btn.textContent) ? btn.textContent.trim() : '';
-        panelTitle.innerHTML = `Mod Menu - ${tabName}`;
-
-        if (targetTabId === 'ls-editor-tab') {
-          modMenuFooter.style.display = 'flex';
-          populateMenu();
-        } else {
-          modMenuFooter.style.display = 'none';
-        }
-
-        if (targetTabId === 'console-tab') {
-          consoleTab.classList.remove('expanded');
-          if (consoleExpandBtn) consoleExpandBtn.classList.remove('expanded');
-          consoleInput && consoleInput.focus();
-          consoleTab.setAttribute('aria-hidden', 'false');
-        } else {
-          consoleTab.classList.remove('expanded');
-          if (consoleExpandBtn) consoleExpandBtn.classList.remove('expanded');
-          consoleTab.setAttribute('aria-hidden', 'true');
-        }
-      }
-
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const tabId = button.dataset.tab + '-tab';
-          switchTab(tabId);
-        });
-      });
-
-      function openMenu() {
-        loadSettings();
-        resetPanelPosition();
-        overlay.classList.remove('hidden');
-        overlay.classList.add('visible');
-        switchTab('ls-editor-tab');
-        panel.setAttribute('aria-hidden', 'false');
-      }
-
-      function closeMenu() {
-        overlay.classList.remove('visible');
-        overlay.classList.add('hidden');
-        panel.setAttribute('aria-hidden', 'true');
-        consoleTab.classList.remove('expanded');
-        if (consoleExpandBtn) consoleExpandBtn.classList.remove('expanded');
-      }
-
-      openBtn.addEventListener('click', openMenu);
-      closeBtn.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
-      closeBtn.addEventListener('touchend', (e) => { e.preventDefault(); closeMenu(); }, { passive: false });
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) { closeMenu(); } });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (overlay.classList.contains('visible')) closeMenu();
-        }
-      });
-
-      document.addEventListener('DOMContentLoaded', () => {
-        loadSettings();
-        consoleTab.classList.remove('expanded');
-      });
-
-    </script>
-
-    <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-    const gearBtn = document.getElementById("mod-menu-btn");
-
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    let targetX = 0;
-    let targetY = 0;
-
-    let currentX = 0;
-    let currentY = 0;
-
-    gearBtn.style.position = "fixed";
-    gearBtn.style.zIndex = "2147483647";
-    gearBtn.style.touchAction = "none";
-    gearBtn.style.transition = "none";
-
-    const btnSize = 56;
-    const initialRight = 70;  // 70px từ phải
-    const initialBottom = 70; // 70px từ dưới
-
-    currentX = targetX = window.innerWidth - initialRight;
-    currentY = targetY = window.innerHeight - initialBottom;
-
-    const startDrag = (e) => {
-        const touch = e.touches ? e.touches[0] : e;
-
-        if (e.type === 'mousedown' || e.type === 'touchstart') {
-            const dx = touch.clientX - currentX;
-            const dy = touch.clientY - currentY;
-
-            if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
-                return;
-            }
-        }
-
-        offsetX = touch.clientX - currentX;
-        offsetY = touch.clientY - currentY;
-
-        isDragging = true;
-        gearBtn.style.transition = "none";
-    };
-
-    const moveDrag = (e) => {
-        if (!isDragging) return;
-
-        const touch = e.touches ? e.touches[0] : e;
-
-        if (e.cancelable) e.preventDefault();
-
-        const safetyMargin = 5;
-
-        targetX = touch.clientX - offsetX;
-        targetY = touch.clientY - offsetY;
-
-        const maxX = window.innerWidth - btnSize - safetyMargin;
-        const maxY = window.innerHeight - btnSize - safetyMargin;
-
-        targetX = Math.max(safetyMargin, Math.min(targetX, maxX));
-        targetY = Math.max(safetyMargin, Math.min(targetY, maxY));
-    };
-
-    const stopDrag = () => {
-        isDragging = false;
-        gearBtn.style.transition = "transform 0.12s ease";
-    };
-
-    function animate() {
-        currentX += (targetX - currentX) * 0.25;
-        currentY += (targetY - currentY) * 0.25;
-
-        gearBtn.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-
-        requestAnimationFrame(animate);
-    }
-
-    requestAnimationFrame(animate);
-
-    gearBtn.addEventListener("mousedown", startDrag);
-    window.addEventListener("mousemove", moveDrag);
-    window.addEventListener("mouseup", stopDrag);
-
-    gearBtn.addEventListener("touchstart", startDrag, { passive: true });
-    window.addEventListener("touchmove", moveDrag, { passive: false });
-    window.addEventListener("touchend", stopDrag);
-
-    gearBtn.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-    gearBtn.style.left = '0';
-    gearBtn.style.top = '0';
-});
-    </script>
-
-    <script>
+</head>
+<body>
+
+<div id="version" style="z-index: 999; position: absolute; color: white; right: 10px; top: 10px; opacity: 0.5;">version 1.0.0</div>
+<div id="content"></div>
+
+<script type="text/javascript">
+	function addScript(src, buster, callback) {
+		var s = document.createElement('script'); s.setAttribute('src', src + '?v=' + buster);
+		if (typeof callback === 'function') { s.onload = callback; } document.body.appendChild(s);
+	}
+
+	document.addEventListener("deviceready", function() {
+		addScript('version.js', Date.now(), function () {
+			addScript("./mythbeast_arena.js", version, function () {
+                const GAME_ASPECT_RATIO = 9 / 16;
+                const screenHeight = window.innerHeight;
+                const screenWidth = window.innerWidth;
+                let logicalHeight = screenHeight;
+                let logicalWidth = logicalHeight * GAME_ASPECT_RATIO;
+                if (logicalWidth > screenWidth) {
+                    logicalWidth = screenWidth;
+                    logicalHeight = logicalWidth / GAME_ASPECT_RATIO;
+                }
+                const contentDiv = document.getElementById("content");
+                contentDiv.style.width = logicalWidth + 'px';
+                contentDiv.style.height = logicalHeight + 'px';
+                const finalWidth = contentDiv.clientWidth;
+                const finalHeight = contentDiv.clientHeight;
+				lime.embed("mythbeast_arena", "content", finalWidth * 2, finalHeight * 2, {background:"000000"});
+			});
+		});
+	});
+    setTimeout(function() { document.dispatchEvent(new Event('deviceready')); }, 3000);
+</script>
+
+<script>
 (function () {
-  if (!localStorage.getItem("mod_uuid")) {
-    const uuid = crypto.randomUUID
-      ? crypto.randomUUID()
-      : "xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0;
-          const v = c === "x" ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-
-    localStorage.setItem("mod_uuid", uuid);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    console.log("[INFO] Mobile detected → native touch only");
+    return;
   }
-})();
-</script>
+  if (window.__FAKE_TOUCH_ENABLED__) return;
+  window.__FAKE_TOUCH_ENABLED__ = true;
 
-    <script>
-(() => {
-  const WS_URL = "wss://dw-onlinedashboard.onrender.com";
+  let isDown = false;
+  let canvas = null;
 
-  const uuid = localStorage.getItem("mod_uuid");
+  const waitCanvas = setInterval(() => {
+    canvas = document.querySelector("canvas");
+    if (canvas) {
+      clearInterval(waitCanvas);
+      init();
+      console.log("[OK] Fake touch ready");
+    }
+  }, 100);
 
-  const countEl  = document.getElementById("online-count");
-  const totalEl  = document.getElementById("total-users");
-  const peakEl   = document.getElementById("peak-online");
-  const statusEl = document.getElementById("online-status");
+  function init() {
+    canvas.setAttribute("tabindex", "0");
+    canvas.focus();
 
-  let ws;
-  const history = []; // dùng cho chart
-  const MAX_POINTS = 30;
+    function createTouch(type, x, y) {
+      const touch = new Touch({
+        identifier: 0,
+        target: canvas,
+        clientX: x,
+        clientY: y,
+        pageX: x,
+        pageY: y,
+        radiusX: 10,
+        radiusY: 10,
+        rotationAngle: 0,
+        force: 1
+      });
 
-  function setStatus(text, color = "#aaa") {
-    statusEl.textContent = text;
-    statusEl.style.color = color;
-  }
+      const event = new TouchEvent(type, {
+        touches: type === "touchend" ? [] : [touch],
+        targetTouches: type === "touchend" ? [] : [touch],
+        changedTouches: [touch],
+        bubbles: true,
+        cancelable: true
+      });
 
-  function connect() {
-    setStatus("⏳ Đang kết nối server...");
-
-    ws = new WebSocket(WS_URL);
-
-    ws.onopen = () => {
-      setStatus("🟢 Server Online", "#7CFF7C");
-      ws.send(JSON.stringify({ uuid }));
-    };
-
-    ws.onmessage = e => {
-      try {
-        const data = JSON.parse(e.data);
-
-        if (typeof data.online === "number") {
-          countEl.textContent = data.online;
-          history.push(data.online);
-          if (history.length > MAX_POINTS) history.shift();
-          drawChart();
-        }
-
-        if (typeof data.total === "number") totalEl.textContent = data.total;
-        if (typeof data.peak === "number") peakEl.textContent = data.peak;
-
-      } catch {}
-    };
-
-    ws.onclose = () => {
-      setStatus("🔴 Server Offline – reconnecting...", "#FF7A7A");
-      setTimeout(connect, 3000);
-    };
-
-    ws.onerror = () => {
-      setStatus("⚠️ Lỗi WebSocket", "#FFC66A");
-    };
-  }
-
-  function drawChart() {
-    const canvas = document.getElementById("online-chart");
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width;
-    const h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = "#b388ff";
-    ctx.lineWidth = 2;
-
-    const max = Math.max(...history, 1);
-
-    ctx.beginPath();
-    history.forEach((v, i) => {
-      const x = (i / (MAX_POINTS - 1)) * w;
-      const y = h - (v / max) * h;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-  }
-
-  document.addEventListener("DOMContentLoaded", connect);
-})();
-</script>
-
-    <script>
-function loadGame() {
-  function start() {
-    function loadScript(src, version, cb) {
-      const s = document.createElement("script");
-      s.src = src + "?v=" + version;
-      if (cb) s.onload = cb;
-      document.body.appendChild(s);
+      canvas.dispatchEvent(event);
     }
 
-    loadScript("version.js", Date.now(), function () {
-      loadScript("./dynamons_world.min.js", version, function () {
-        const content = document.getElementById("content");
-        const w = 2 * content.clientWidth;
-        const h = 2 * content.clientHeight;
-        lime.embed("dynamons_world", "content", w, h, { background: "000000" });
-      });
+    canvas.addEventListener("pointerdown", e => {
+      if (e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
+      e.preventDefault();
+      canvas.setPointerCapture(e.pointerId);
+      isDown = true;
+      createTouch("touchstart", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("pointermove", e => {
+      if (!isDown) return;
+      createTouch("touchmove", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("pointerup", e => {
+      if (!isDown) return;
+      isDown = false;
+      createTouch("touchend", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("blur", () => {
+      if (!isDown) return;
+      isDown = false;
+      createTouch("touchend", 0, 0);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && isDown) {
+        isDown = false;
+        createTouch("touchend", 0, 0);
+      }
     });
   }
-
-  if (window.cordova) {
-    document.addEventListener("deviceready", start, { once: true });
-  } else {
-    start();
-  }
-}
-
-document.addEventListener("DOMContentLoaded", loadGame);
+})();
 </script>
 
-  </body>
+
+<script>
+document.addEventListener("contextmenu", function (e) {
+  if (e.target.tagName === "CANVAS") {
+    e.preventDefault();
+    return false;
+  }
+});
+</script>
+</body>
 </html>
