@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>MythBeast Arena</title>
+	<title>Dynamons World Modded</title>
 	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<script type="text/javascript">
@@ -57,7 +57,7 @@
 
 	document.addEventListener("deviceready", function() {
 		addScript('version.js', Date.now(), function () {
-			addScript("./mythbeast_arena.js", version, function () {
+			addScript("./dynamons_world.min.js", version, function () {
                 const GAME_ASPECT_RATIO = 9 / 16;
                 const screenHeight = window.innerHeight;
                 const screenWidth = window.innerWidth;
@@ -72,7 +72,7 @@
                 contentDiv.style.height = logicalHeight + 'px';
                 const finalWidth = contentDiv.clientWidth;
                 const finalHeight = contentDiv.clientHeight;
-				lime.embed("mythbeast_arena", "content", finalWidth * 2, finalHeight * 2, {background:"000000"});
+				lime.embed("dynamons_world", "content", finalWidth * 2, finalHeight * 2, {background:"000000"});
 			});
 		});
 	});
