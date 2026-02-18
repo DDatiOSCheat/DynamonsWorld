@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Dynamons World :)</title>
+	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta property="og:title" content="Dynamons World Modded" />
+<meta property="og:description" content="Chơi dynamons world modded bởi tinysweet - discord : tinysweet_dev" />
+<meta property="og:image" content="https://tinysweet.qzz.io/dynamons/favicon.png" />
+<meta property="og:url" content="https://tinysweet.qzz.io/dynamons/" />
+<meta property="og:type" content="website" />
+	<script type="text/javascript">
+        console.log("Game Modded By DDatiOS");
+        window.GameAnalytics = { configureAutoDetectAppVersion: function() {}, setEnabledInfoLog: function() {}, setEnabledVerboseLog: function() {}, initialize: function() {}, startSession: function() {} };
+        window.plugins = { impacTracking: { requestTracking: function(arg1, successCallback, errorCallback) { if (typeof successCallback === 'function') { successCallback("granted"); } } } };
+        window.notificationAuthorization = { requestNotificationAuthorization: function(callback) { if (typeof callback === 'function') { callback(); } } };
+        window.navigator.didomi = { initialize: function(apiKey, anotherKey, successCallback, errorCallback) { if (typeof errorCallback === 'function') { errorCallback(); } }, getUserConsent: function(callback) { if(typeof callback === 'function') { callback('true'); } }, setUserDisagreeToAll: function() {}, showNotice: function() {} };
+        window.store = { QUIET: 'quiet', NON_CONSUMABLE: 'non_consumable', CONSUMABLE: 'consumable', verbosity: '', when: function() { return this; }, updated: function() { return this; }, error: function(cb) { return this; }, approved: function() { return this; }, cancelled: function(cb) { return this; }, finished: function() { return this; }, initiated: function() { return this; }, register: function() {}, order: function() {}, get: function(productId) { return { id: productId, price: "$0.99", title: "Mock Product", state: "approved", owned: true }; }, refresh: function() { var mockPromise = { completed: function(callback) { if (typeof callback === 'function') { callback(); } return this; }, failed: function(callback) { return this; }, cancelled: function(callback) { return this; } }; return mockPromise; } };
+        window.cordova = { plugin: { cloudsettings: { isSignedInToICloud: function(callback) { if (typeof callback === 'function') { callback(false); } }, enableDebug: function() {}, exists: function() {}, save: function() {}, load:function() {} } }, plugins: { impacTracking: window.plugins.impacTracking, firebase: { analytics: { logEvent: function(name, params) { console.log("Mock: FirebaseAnalytics.logEvent() -> Name: " + name, params); } } } } };
+    </script>
+    <script type="text/javascript" src="./lib/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script type="text/javascript" src="./lib/firebase-database.js"></script>
+	<style>
+        html, body {
+            margin: 0; padding: 0; height: 100%; overflow: hidden;
+            background-color: #1a1a1a;
+            display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        canvas {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (pointer: coarse) {
+  canvas {
+    touch-action: auto;
+  }
+}
+
+@media (pointer: fine) {
+  canvas {
+    touch-action: none;
+  }
+}
+        #content { background: #ffffff; }
+    </style>
+</head>
+<body>
+
+<div id="version" style="z-index: 999; position: absolute; color: white; right: 10px; top: 10px; opacity: 0.5;">version 1.12.42 web modded</div>
+<div id="content"></div>
+
+<script type="text/javascript">
+	function addScript(src, buster, callback) {
+		var s = document.createElement('script'); s.setAttribute('src', src + '?v=' + buster);
+		if (typeof callback === 'function') { s.onload = callback; } document.body.appendChild(s);
+	}
+
+	document.addEventListener("deviceready", function() {
+		addScript('version.js', Date.now(), function () {
+			addScript("./dynamons_world.min.js", Date.now(), function () {
+                const GAME_ASPECT_RATIO = 9 / 16;
+                const screenHeight = window.innerHeight;
+                const screenWidth = window.innerWidth;
+                let logicalHeight = screenHeight;
+                let logicalWidth = logicalHeight * GAME_ASPECT_RATIO;
+                if (logicalWidth > screenWidth) {
+                    logicalWidth = screenWidth;
+                    logicalHeight = logicalWidth / GAME_ASPECT_RATIO;
+                }
+                const contentDiv = document.getElementById("content");
+                contentDiv.style.width = logicalWidth + 'px';
+                contentDiv.style.height = logicalHeight + 'px';
+                const finalWidth = contentDiv.clientWidth;
+                const finalHeight = contentDiv.clientHeight;
+				lime.embed("dynamons_world", "content", finalWidth * 2, finalHeight * 2, {background:"000000"});
+			});
+		});
+	});
+    setTimeout(function() { document.dispatchEvent(new Event('deviceready')); }, 3000);
+</script>
+
+<script>
+(function () {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    console.log("[INFO] Mobile detected → native touch only");
+    return;
+  }
+  if (window.__FAKE_TOUCH_ENABLED__) return;
+  window.__FAKE_TOUCH_ENABLED__ = true;
+
+  let isDown = false;
+  let canvas = null;
+
+  const waitCanvas = setInterval(() => {
+    canvas = document.querySelector("canvas");
+    if (canvas) {
+      clearInterval(waitCanvas);
+      init();
+      console.log("[OK] Fake touch ready");
+    }
+  }, 100);
+
+  function init() {
+    canvas.setAttribute("tabindex", "0");
+    canvas.focus();
+
+    function createTouch(type, x, y) {
+      const touch = new Touch({
+        identifier: 0,
+        target: canvas,
+        clientX: x,
+        clientY: y,
+        pageX: x,
+        pageY: y,
+        radiusX: 10,
+        radiusY: 10,
+        rotationAngle: 0,
+        force: 1
+      });
+
+      const event = new TouchEvent(type, {
+        touches: type === "touchend" ? [] : [touch],
+        targetTouches: type === "touchend" ? [] : [touch],
+        changedTouches: [touch],
+        bubbles: true,
+        cancelable: true
+      });
+
+      canvas.dispatchEvent(event);
+    }
+
+    canvas.addEventListener("pointerdown", e => {
+      if (e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
+      e.preventDefault();
+      canvas.setPointerCapture(e.pointerId);
+      isDown = true;
+      createTouch("touchstart", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("pointermove", e => {
+      if (!isDown) return;
+      createTouch("touchmove", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("pointerup", e => {
+      if (!isDown) return;
+      isDown = false;
+      createTouch("touchend", e.clientX, e.clientY);
+    });
+
+    window.addEventListener("blur", () => {
+      if (!isDown) return;
+      isDown = false;
+      createTouch("touchend", 0, 0);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && isDown) {
+        isDown = false;
+        createTouch("touchend", 0, 0);
+      }
+    });
+  }
+})();
+</script>
+
+
+<script>
+document.addEventListener("contextmenu", function (e) {
+  if (e.target.tagName === "CANVAS") {
+    e.preventDefault();
+    return false;
+  }
+});
+</script>
+</body>
+</html>
